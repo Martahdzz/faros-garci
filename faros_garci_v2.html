@@ -1,0 +1,679 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Faros Garci</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f4f2ed;--surface:#fff;--surface2:#f0ede7;--border:#e0dbd2;--text:#1a1916;--muted:#7a7670;--accent:#2a5424;--accent-bg:#eaf2e8;--red:#b33a1a;--red-bg:#fdf0eb;--amber:#7a5a00;--amber-bg:#fdf6e0;--blue:#1a3f7a;--blue-bg:#e8eef8;--sans:'DM Sans',sans-serif;--mono:'DM Mono',monospace;--r:8px}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--sans);background:var(--bg);color:var(--text);font-size:14px;line-height:1.5;min-height:100vh}
+.app{display:flex;min-height:100vh}
+.sidebar{width:210px;background:var(--text);color:#fff;display:flex;flex-direction:column;flex-shrink:0;position:sticky;top:0;height:100vh}
+.logo{padding:22px 18px 16px;border-bottom:1px solid rgba(255,255,255,.1)}
+.logo h1{font-size:15px;font-weight:500;letter-spacing:.05em}
+.logo p{font-size:11px;color:rgba(255,255,255,.4);font-family:var(--mono);margin-top:2px}
+.nav{padding:10px 0;flex:1}
+.nav-item{display:flex;align-items:center;gap:9px;padding:9px 18px;cursor:pointer;font-size:13px;color:rgba(255,255,255,.55);transition:all .12s;border-left:3px solid transparent}
+.nav-item:hover{color:#fff;background:rgba(255,255,255,.07)}
+.nav-item.active{color:#fff;background:rgba(255,255,255,.11);border-left-color:#7ecf74}
+.nav-icon{width:16px;text-align:center;flex-shrink:0}
+.sf{padding:14px 18px;border-top:1px solid rgba(255,255,255,.1)}
+.sf-row{display:flex;justify-content:space-between;font-size:11px;color:rgba(255,255,255,.45);margin-bottom:3px}
+.sf-row span:last-child{color:#7ecf74;font-family:var(--mono)}
+.main{flex:1;overflow:auto}
+.page{display:none;padding:28px 28px 60px}
+.page.active{display:block}
+.ph{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:24px;gap:12px;flex-wrap:wrap}
+.pt{font-size:20px;font-weight:500}
+.ps{font-size:12px;color:var(--muted);margin-top:2px}
+.btn{display:inline-flex;align-items:center;gap:5px;padding:7px 14px;border-radius:var(--r);font-size:13px;font-family:var(--sans);cursor:pointer;border:none;transition:all .12s;font-weight:400}
+.btn-p{background:var(--accent);color:#fff}.btn-p:hover{background:#214219}
+.btn-g{background:transparent;color:var(--muted);border:1px solid var(--border)}.btn-g:hover{background:var(--surface2);color:var(--text)}
+.btn-sm{padding:4px 9px;font-size:12px}
+.bico{background:transparent;border:1px solid var(--border);color:var(--muted);width:28px;height:28px;display:inline-flex;align-items:center;justify-content:center;border-radius:6px;cursor:pointer;font-size:13px;flex-shrink:0;transition:all .12s}
+.bico:hover{background:var(--surface2);color:var(--text)}
+.bico.del:hover{background:var(--red-bg);color:var(--red);border-color:#f0c4b4}
+.kpi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(148px,1fr));gap:10px;margin-bottom:24px}
+.kpi{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:14px}
+.kpi-l{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:5px}
+.kpi-v{font-size:22px;font-weight:500;font-family:var(--mono)}
+.kpi-v.g{color:var(--accent)}.kpi-v.r{color:var(--red)}.kpi-v.a{color:var(--amber)}
+.kpi-s{font-size:11px;color:var(--muted);margin-top:3px}
+.tw{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);overflow:hidden}
+.tb{display:flex;align-items:center;gap:8px;padding:12px 14px;border-bottom:1px solid var(--border);flex-wrap:wrap}
+.srch{flex:1;min-width:140px;padding:7px 11px;border:1px solid var(--border);border-radius:6px;font-size:13px;font-family:var(--sans);background:var(--bg);color:var(--text);outline:none}
+.srch:focus{border-color:var(--accent)}
+select.srch{flex:0;width:auto;cursor:pointer}
+table{width:100%;border-collapse:collapse}
+th{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);font-weight:500;padding:9px 12px;text-align:left;background:var(--surface2);border-bottom:1px solid var(--border);white-space:nowrap}
+td{padding:9px 12px;border-bottom:1px solid var(--border);vertical-align:middle}
+tr:last-child td{border-bottom:none}
+tr.dr:hover td{background:#fafaf8}
+.mono{font-family:var(--mono);font-size:12px}
+.muted{color:var(--muted)}
+.empty-td{text-align:center;padding:40px;color:var(--muted);font-size:13px}
+.badge{display:inline-block;padding:2px 8px;border-radius:20px;font-size:11px;font-weight:500;white-space:nowrap}
+.bg{background:var(--accent-bg);color:var(--accent)}
+.br{background:var(--red-bg);color:var(--red)}
+.ba{background:var(--amber-bg);color:var(--amber)}
+.bb{background:var(--blue-bg);color:var(--blue)}
+.edit{cursor:pointer;border-radius:4px;padding:1px 4px;transition:background .1s}
+.edit:hover{background:var(--surface2)}
+.ii{padding:3px 6px;border:1px solid var(--accent);border-radius:4px;font-size:13px;font-family:var(--sans);background:#fff;color:var(--text);outline:none;min-width:60px}
+.is{padding:3px 6px;border:1px solid var(--accent);border-radius:4px;font-size:12px;font-family:var(--sans);background:#fff;color:var(--text);outline:none;cursor:pointer}
+.pov{display:none;position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:50}
+.pov.open{display:block}
+.panel{position:fixed;top:0;right:0;width:520px;max-width:95vw;height:100vh;background:var(--surface);box-shadow:-4px 0 24px rgba(0,0,0,.12);overflow-y:auto;z-index:51;display:none;flex-direction:column}
+.panel.open{display:flex}
+.ph2{display:flex;align-items:center;justify-content:space-between;padding:20px 22px;border-bottom:1px solid var(--border);flex-shrink:0}
+.ph2 h2{font-size:16px;font-weight:500}
+.pb{padding:22px;flex:1}
+.psec{margin-bottom:22px}
+.psec-t{font-size:11px;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);margin-bottom:10px;font-weight:500}
+.frow{display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid var(--border)}
+.frow:last-child{border-bottom:none}
+.fl{font-size:12px;color:var(--muted);flex-shrink:0;margin-right:12px}
+.fv{font-size:13px;text-align:right}
+.gvt{width:100%;border-collapse:collapse;margin-top:6px}
+.gvt th{font-size:10px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);padding:5px 8px;background:var(--surface2);border:1px solid var(--border);font-weight:500}
+.gvt td{padding:6px 8px;border:1px solid var(--border);font-size:12px;vertical-align:middle}
+.gvt tr:hover td{background:#fafaf8}
+.gvi{padding:4px 7px;border:1px solid var(--border);border-radius:5px;font-size:12px;font-family:var(--sans);background:#fff;outline:none;width:100%}
+.gvi:focus{border-color:var(--accent)}
+.mbg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:80;align-items:center;justify-content:center}
+.mbg.open{display:flex}
+.modal{background:var(--surface);border-radius:12px;padding:26px;width:460px;max-width:95vw;max-height:88vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.15)}
+.modal h2{font-size:15px;font-weight:500;margin-bottom:18px}
+.fg{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.fg .full{grid-column:1/-1}
+.field{display:flex;flex-direction:column;gap:4px}
+.field label{font-size:11px;color:var(--muted);font-weight:500;text-transform:uppercase;letter-spacing:.04em}
+.field input,.field select,.field textarea{padding:7px 10px;border:1px solid var(--border);border-radius:6px;font-size:13px;font-family:var(--sans);background:var(--bg);color:var(--text);outline:none;transition:border .12s}
+.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--accent)}
+.field textarea{resize:vertical;min-height:56px}
+.mf{display:flex;gap:8px;justify-content:flex-end;margin-top:18px;border-top:1px solid var(--border);padding-top:16px}
+.ig{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:12px}
+.ic{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:16px}
+.ic-id{font-family:var(--mono);font-size:10px;color:var(--muted);margin-bottom:4px}
+.ic-n{font-size:13px;font-weight:500;margin-bottom:10px;line-height:1.3}
+.ic-u{font-size:30px;font-weight:300;font-family:var(--mono);line-height:1}
+.ic-u.zero{color:var(--muted)}.ic-u.low{color:var(--red)}.ic-u.ok{color:var(--accent)}
+.ic-l{font-size:11px;color:var(--muted);margin-top:2px}
+.ic-ctrl{display:flex;gap:6px;margin-top:12px;align-items:center}
+.sb{width:32px;height:32px;border:1px solid var(--border);background:var(--bg);border-radius:6px;cursor:pointer;font-size:18px;display:flex;align-items:center;justify-content:center;transition:background .1s;line-height:1}
+.sb:hover{background:var(--surface2)}
+.mcg{display:grid;grid-template-columns:repeat(auto-fill,minmax(178px,1fr));gap:10px;margin-bottom:24px}
+.mc{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:14px}
+.mc-n{font-size:13px;font-weight:500;margin-bottom:8px}
+.mc-r{display:flex;justify-content:space-between;font-size:12px;color:var(--muted);margin-bottom:2px}
+.mc-r span:last-child{font-family:var(--mono);color:var(--text)}
+.mbar{height:3px;background:var(--surface2);border-radius:2px;margin-top:8px}
+.mbar-f{height:100%;background:var(--accent);border-radius:2px}
+</style>
+</head>
+<body>
+<div class="app">
+<aside class="sidebar">
+  <div class="logo"><h1>Faros Garci</h1><p>gestión · 2026</p></div>
+  <nav class="nav" id="nav"></nav>
+  <div class="sf" id="sf"></div>
+</aside>
+<main class="main">
+  <section class="page active" id="page-resumen">
+    <div class="ph"><div><div class="pt">Resumen</div><div class="ps">Vista general del negocio</div></div></div>
+    <div class="kpi-grid" id="kpi"></div>
+    <div class="mcg" id="months"></div>
+  </section>
+  <section class="page" id="page-ventas">
+    <div class="ph"><div><div class="pt">Ventas</div><div class="ps" id="vs"></div></div><button class="btn btn-p" onclick="openModal('venta')">+ Nueva venta</button></div>
+    <div class="tw"><div class="tb">
+      <input class="srch" type="text" placeholder="Buscar…" oninput="filt.v=this.value;renderV()">
+      <select class="srch" onchange="filt.ve=this.value;renderV()"><option value="">Todos los estados</option><option>Preparando</option><option>Enviado</option><option>Entregado</option></select>
+    </div><div style="overflow-x:auto"><table><thead id="vh"></thead><tbody id="vb"></tbody></table></div></div>
+  </section>
+  <section class="page" id="page-gastos">
+    <div class="ph"><div><div class="pt">Gastos</div><div class="ps" id="gs"></div></div><button class="btn btn-p" onclick="openModal('gasto')">+ Nuevo gasto</button></div>
+    <div class="tw"><div class="tb">
+      <input class="srch" type="text" placeholder="Buscar…" oninput="filt.g=this.value;renderG()">
+      <select class="srch" onchange="filt.gc=this.value;renderG()"><option value="">Todas las categorías</option><option>Faro base</option><option>Material</option><option>Electricidad</option><option>Herramienta</option><option>Envío</option></select>
+    </div><div style="overflow-x:auto"><table><thead id="gh"></thead><tbody id="gb"></tbody></table></div></div>
+  </section>
+  <section class="page" id="page-clientes">
+    <div class="ph"><div><div class="pt">Clientes</div><div class="ps" id="cs"></div></div><button class="btn btn-p" onclick="openModal('cliente')">+ Nuevo cliente</button></div>
+    <div class="tw"><div class="tb">
+      <input class="srch" type="text" placeholder="Buscar…" oninput="filt.c=this.value;renderC()">
+      <select class="srch" onchange="filt.cc=this.value;renderC()"><option value="">Todos los canales</option><option>Wallapop</option><option>Facebook</option><option>Vinted</option><option>Boca a boca</option></select>
+    </div><div style="overflow-x:auto"><table><thead id="ch"></thead><tbody id="cb"></tbody></table></div></div>
+  </section>
+  <section class="page" id="page-inventario">
+    <div class="ph"><div><div class="pt">Inventario</div><div class="ps" id="is2"></div></div><button class="btn btn-p" onclick="openModal('lote')">+ Nuevo lote</button></div>
+    <div class="ig" id="ig"></div>
+  </section>
+</main>
+</div>
+
+<div class="pov" id="pov" onclick="closePanel()"></div>
+<div class="panel" id="panel">
+  <div class="ph2"><h2 id="panel-title"></h2><button class="bico" onclick="closePanel()">✕</button></div>
+  <div class="pb" id="pb"></div>
+</div>
+
+<div class="mbg" id="modal-venta"><div class="modal"><h2>Nueva venta</h2><div class="fg">
+  <div class="field"><label>Fecha</label><input type="date" id="nv-f"></div>
+  <div class="field"><label>Precio final (€)</label><input type="number" step="0.01" id="nv-p" placeholder="60.00"></div>
+  <div class="field"><label>Cliente</label><select id="nv-c"></select></div>
+  <div class="field"><label>Lote de faro</label><select id="nv-l"></select></div>
+  <div class="field"><label>Estado</label><select id="nv-e"><option>Preparando</option><option>Enviado</option><option>Entregado</option></select></div>
+  <div class="field"><label>Valoración</label><select id="nv-v"><option>5</option><option>4</option><option>3</option><option>2</option><option>1</option></select></div>
+  <div class="field full"><label>Notas</label><textarea id="nv-n"></textarea></div>
+</div><div class="mf"><button class="btn btn-g" onclick="closeModal('venta')">Cancelar</button><button class="btn btn-p" onclick="saveV()">Guardar</button></div></div></div>
+
+<div class="mbg" id="modal-gasto"><div class="modal"><h2>Nuevo gasto</h2><div class="fg">
+  <div class="field"><label>Fecha</label><input type="date" id="ng-f"></div>
+  <div class="field"><label>Categoría</label><select id="ng-c"><option>Faro base</option><option>Material</option><option>Electricidad</option><option>Herramienta</option><option>Envío</option><option>Otro</option></select></div>
+  <div class="field full"><label>Descripción</label><input type="text" id="ng-d" placeholder="Ej: Conectores KTM"></div>
+  <div class="field"><label>Importe total (€)</label><input type="number" step="0.01" id="ng-i"></div>
+  <div class="field"><label>Unidades</label><input type="number" id="ng-u" value="1"></div>
+  <div class="field full"><label>Notas</label><textarea id="ng-n"></textarea></div>
+</div><div class="mf"><button class="btn btn-g" onclick="closeModal('gasto')">Cancelar</button><button class="btn btn-p" onclick="saveG()">Guardar</button></div></div></div>
+
+<div class="mbg" id="modal-cliente"><div class="modal"><h2>Nuevo cliente</h2><div class="fg">
+  <div class="field full"><label>Nombre / Nick</label><input type="text" id="nc-n"></div>
+  <div class="field"><label>Marca moto</label><select id="nc-m"><option>Beta</option><option>KTM</option><option>Husqvarna</option><option>Rieju</option><option>Gas Gas</option><option>Honda</option><option>Yamaha</option><option>Otro</option></select></div>
+  <div class="field"><label>Canal contacto</label><select id="nc-c"><option>Wallapop</option><option>Facebook</option><option>Vinted</option><option>Boca a boca</option><option>Instagram</option><option>Otro</option></select></div>
+  <div class="field"><label>Estado</label><select id="nc-e"><option>Interesado</option><option>Venta</option></select></div>
+  <div class="field"><label>Fecha</label><input type="date" id="nc-f"></div>
+  <div class="field full"><label>Notas</label><textarea id="nc-no"></textarea></div>
+</div><div class="mf"><button class="btn btn-g" onclick="closeModal('cliente')">Cancelar</button><button class="btn btn-p" onclick="saveC()">Guardar</button></div></div></div>
+
+<div class="mbg" id="modal-lote"><div class="modal"><h2>Nuevo lote de faros</h2><div class="fg">
+  <div class="field full"><label>Nombre del lote</label><input type="text" id="nl-n" placeholder="Faro (Lote 8)"></div>
+  <div class="field"><label>Unidades disponibles</label><input type="number" id="nl-u" value="0"></div>
+  <div class="field full"><label>Notas</label><textarea id="nl-no"></textarea></div>
+</div><div class="mf"><button class="btn btn-g" onclick="closeModal('lote')">Cancelar</button><button class="btn btn-p" onclick="saveL()">Guardar</button></div></div></div>
+
+<script>
+let ventas=[
+  {id:'V001',fecha:'2026-03-31',cliente:'C001',faro:'F001',precio:60,estado:'Entregado',valoracion:5,notas:''},
+  {id:'V002',fecha:'2026-03-31',cliente:'C002',faro:'F002',precio:120,estado:'Entregado',valoracion:5,notas:'2 Faros'},
+  {id:'V003',fecha:'2026-03-31',cliente:'C003',faro:'F002',precio:60,estado:'Entregado',valoracion:5,notas:''},
+  {id:'V004',fecha:'2026-03-31',cliente:'C004',faro:'F002',precio:56,estado:'Entregado',valoracion:5,notas:''},
+  {id:'V005',fecha:'2026-03-31',cliente:'C005',faro:'F002',precio:68.36,estado:'Entregado',valoracion:5,notas:''},
+  {id:'V006',fecha:'2026-03-31',cliente:'C006',faro:'F002',precio:60,estado:'Entregado',valoracion:5,notas:''},
+  {id:'V007',fecha:'2026-03-31',cliente:'C007',faro:'F002',precio:60,estado:'Entregado',valoracion:5,notas:''},
+  {id:'V008',fecha:'2026-03-31',cliente:'C008',faro:'F002',precio:60,estado:'Entregado',valoracion:5,notas:''},
+  {id:'V009',fecha:'2026-03-31',cliente:'C009',faro:'F003',precio:60,estado:'Entregado',valoracion:5,notas:''},
+  {id:'V010',fecha:'2026-03-31',cliente:'C010',faro:'F003',precio:60,estado:'Entregado',valoracion:5,notas:''},
+  {id:'V011',fecha:'2026-03-31',cliente:'C011',faro:'F003',precio:60,estado:'Entregado',valoracion:5,notas:''},
+  {id:'V012',fecha:'2026-03-31',cliente:'C012',faro:'F003',precio:65,estado:'Entregado',valoracion:5,notas:''},
+  {id:'V013',fecha:'2026-03-31',cliente:'C013',faro:'F003',precio:65,estado:'Entregado',valoracion:5,notas:''},
+  {id:'V014',fecha:'2026-03-31',cliente:'C014',faro:'F003',precio:57,estado:'Entregado',valoracion:5,notas:''},
+  {id:'V015',fecha:'2026-03-31',cliente:'C015',faro:'F004',precio:60,estado:'Entregado',valoracion:5,notas:''},
+  {id:'V016',fecha:'2026-03-31',cliente:'C016',faro:'F004',precio:60,estado:'Entregado',valoracion:5,notas:''},
+  {id:'V017',fecha:'2026-03-31',cliente:'C017',faro:'F004',precio:65,estado:'Entregado',valoracion:5,notas:''},
+  {id:'V018',fecha:'2026-04-10',cliente:'C018',faro:'F005',precio:250,estado:'Entregado',valoracion:5,notas:'4 Faros'},
+  {id:'V019',fecha:'2026-04-07',cliente:'C021',faro:'F004',precio:60,estado:'Entregado',valoracion:5,notas:''},
+  {id:'V020',fecha:'2026-04-07',cliente:'C019',faro:'F005',precio:65,estado:'Entregado',valoracion:5,notas:''},
+  {id:'V021',fecha:'2026-04-07',cliente:'C020',faro:'F005',precio:60,estado:'Entregado',valoracion:5,notas:''},
+  {id:'V022',fecha:'2026-04-07',cliente:'C025',faro:'F005',precio:60,estado:'Entregado',valoracion:5,notas:''},
+  {id:'V023',fecha:'2026-04-07',cliente:'C024',faro:'F005',precio:60.8,estado:'Entregado',valoracion:5,notas:''},
+  {id:'V024',fecha:'2026-04-08',cliente:'C022',faro:'F005',precio:65.8,estado:'Entregado',valoracion:5,notas:''},
+  {id:'V025',fecha:'2026-04-08',cliente:'C026',faro:'F005',precio:65.8,estado:'Preparando',valoracion:5,notas:''},
+];
+
+let gv=[
+  {id:'GV001',v:'V001',d:'Faro (Lote 1)',pu:16.845,u:1},{id:'GV002',v:'V001',d:'Conector Beta',pu:0.17,u:1},
+  {id:'GV003',v:'V001',d:'Rectificador',pu:0.282,u:1},{id:'GV004',v:'V001',d:'Terminales Cables',pu:0.036567,u:6},
+  {id:'GV005',v:'V001',d:'Tornillería',pu:0.043478,u:10},
+  {id:'GV006',v:'V002',d:'Faro (Lote 2)',pu:11.52875,u:2},{id:'GV007',v:'V002',d:'Conector Beta',pu:0.17,u:2},{id:'GV008',v:'V002',d:'Tornillería',pu:0.043478,u:20},
+  {id:'GV009',v:'V003',d:'Faro (Lote 2)',pu:11.52875,u:1},{id:'GV010',v:'V003',d:'Conector Beta',pu:0.17,u:1},{id:'GV011',v:'V003',d:'Tornillería',pu:0.043478,u:10},
+  {id:'GV012',v:'V004',d:'Faro (Lote 2)',pu:11.52875,u:1},{id:'GV013',v:'V004',d:'Conector Beta',pu:0.17,u:1},{id:'GV014',v:'V004',d:'Tornillería',pu:0.043478,u:10},
+  {id:'GV015',v:'V005',d:'Faro (Lote 2)',pu:11.52875,u:1},{id:'GV016',v:'V005',d:'Conector Beta',pu:0.17,u:1},{id:'GV017',v:'V005',d:'Rectificador',pu:0.282,u:1},{id:'GV018',v:'V005',d:'Terminales Cables',pu:0.036567,u:6},{id:'GV019',v:'V005',d:'Tornillería',pu:0.043478,u:10},
+  {id:'GV020',v:'V006',d:'Faro (Lote 2)',pu:11.52875,u:1},{id:'GV021',v:'V006',d:'Conector Beta',pu:0.17,u:1},{id:'GV022',v:'V006',d:'Tornillería',pu:0.043478,u:10},
+  {id:'GV023',v:'V007',d:'Faro (Lote 2)',pu:11.52875,u:1},{id:'GV024',v:'V007',d:'Conector Beta',pu:0.17,u:1},{id:'GV025',v:'V007',d:'Tornillería',pu:0.043478,u:10},
+  {id:'GV026',v:'V008',d:'Faro (Lote 2)',pu:11.52875,u:1},{id:'GV027',v:'V008',d:'Conector Beta',pu:0.17,u:1},{id:'GV028',v:'V008',d:'Tornillería',pu:0.043478,u:10},
+  {id:'GV029',v:'V009',d:'Faro (Lote 3)',pu:17.216667,u:1},{id:'GV030',v:'V009',d:'Conector Beta',pu:0.17,u:1},{id:'GV031',v:'V009',d:'Tornillería',pu:0.043478,u:10},
+  {id:'GV032',v:'V010',d:'Faro (Lote 3)',pu:17.216667,u:1},{id:'GV033',v:'V010',d:'Conector Beta',pu:0.17,u:1},{id:'GV034',v:'V010',d:'Tornillería',pu:0.043478,u:10},
+  {id:'GV035',v:'V011',d:'Faro (Lote 3)',pu:17.216667,u:1},{id:'GV036',v:'V011',d:'Conector Beta',pu:0.17,u:1},{id:'GV037',v:'V011',d:'Tornillería',pu:0.043478,u:10},
+  {id:'GV038',v:'V012',d:'Faro (Lote 3)',pu:17.216667,u:1},{id:'GV039',v:'V012',d:'Conector KTM - Husqvarna',pu:0.11225,u:1},{id:'GV040',v:'V012',d:'Tornillería',pu:0.043478,u:6},
+  {id:'GV041',v:'V013',d:'Faro (Lote 3)',pu:17.216667,u:1},{id:'GV042',v:'V013',d:'Conector KTM - Husqvarna',pu:0.11225,u:1},{id:'GV043',v:'V013',d:'Tornillería',pu:0.043478,u:6},
+  {id:'GV044',v:'V014',d:'Faro (Lote 3)',pu:17.216667,u:1},{id:'GV045',v:'V014',d:'Conector KTM - Husqvarna',pu:0.11225,u:1},{id:'GV046',v:'V014',d:'Tornillería',pu:0.043478,u:6},
+  {id:'GV047',v:'V015',d:'Faro (Lote 4)',pu:15,u:1},{id:'GV048',v:'V015',d:'Conector KTM - Husqvarna',pu:0.11225,u:1},{id:'GV049',v:'V015',d:'Tornillería',pu:0.043478,u:6},
+  {id:'GV050',v:'V016',d:'Faro (Lote 4)',pu:15,u:1},{id:'GV051',v:'V016',d:'Conector KTM - Husqvarna',pu:0.11225,u:1},{id:'GV052',v:'V016',d:'Tornillería',pu:0.043478,u:6},
+  {id:'GV053',v:'V017',d:'Faro (Lote 4)',pu:15,u:1},{id:'GV054',v:'V017',d:'Conector Rieju 2',pu:3.25,u:1},{id:'GV055',v:'V017',d:'Tornillería',pu:0.043478,u:2},
+  {id:'GV056',v:'V018',d:'Faro (Lote 6)',pu:15.708,u:4},{id:'GV057',v:'V018',d:'Conector Rieju 1',pu:0.617,u:4},{id:'GV058',v:'V018',d:'Tornillería',pu:0.043478,u:8},
+  {id:'GV059',v:'V019',d:'Faro (Lote 4)',pu:15,u:1},{id:'GV060',v:'V019',d:'Conector Beta',pu:0.17,u:1},{id:'GV061',v:'V019',d:'Tornillería',pu:0.043478,u:10},
+  {id:'GV062',v:'V020',d:'Faro (Lote 5)',pu:15.115,u:1},{id:'GV063',v:'V020',d:'Conector Rieju 2',pu:3.25,u:1},{id:'GV064',v:'V020',d:'Tornillería',pu:0.043478,u:2},
+  {id:'GV065',v:'V021',d:'Faro (Lote 5)',pu:15.115,u:1},{id:'GV066',v:'V021',d:'Conector Beta',pu:0.17,u:1},{id:'GV067',v:'V021',d:'Tornillería',pu:0.043478,u:2},
+  {id:'GV068',v:'V022',d:'Faro (Lote 5)',pu:15.115,u:1},{id:'GV069',v:'V022',d:'Conector Beta',pu:0.17,u:1},{id:'GV070',v:'V022',d:'Tornillería',pu:0.043478,u:10},
+  {id:'GV071',v:'V023',d:'Faro (Lote 5)',pu:15.115,u:1},{id:'GV072',v:'V023',d:'Conector KTM - Husqvarna',pu:0.11225,u:1},{id:'GV073',v:'V023',d:'Tornillería',pu:0.043478,u:6},
+  {id:'GV074',v:'V024',d:'Faro (Lote 5)',pu:15.115,u:1},{id:'GV075',v:'V024',d:'Conector KTM - Husqvarna',pu:0.11225,u:1},{id:'GV076',v:'V024',d:'Tornillería',pu:0.043478,u:2},
+  {id:'GV077',v:'V025',d:'Faro (Lote 5)',pu:15.115,u:1},{id:'GV078',v:'V025',d:'Conector KTM - Husqvarna',pu:0.11225,u:1},{id:'GV079',v:'V025',d:'Tornillería',pu:0.043478,u:2},
+];
+
+let gastos=[
+  {id:'G001',fecha:'2026-03-31',cat:'Faro base',desc:'Faro (Lote 1)',imp:33.69,uds:2,pu:16.845,notas:'Lote AliExpress'},
+  {id:'G002',fecha:'2026-03-31',cat:'Material',desc:'Conector Beta',imp:3.4,uds:20,pu:0.17,notas:''},
+  {id:'G003',fecha:'2026-03-31',cat:'Electricidad',desc:'Terminales Cables',imp:10.97,uds:300,pu:0.036567,notas:'No utilizados'},
+  {id:'G004',fecha:'2026-03-31',cat:'Electricidad',desc:'Rectificador',imp:2.82,uds:10,pu:0.282,notas:'No utilizados'},
+  {id:'G005',fecha:'2026-03-31',cat:'Material',desc:'Careta Husqvarna 17-23',imp:11.29,uds:1,pu:11.29,notas:''},
+  {id:'G006',fecha:'2026-03-31',cat:'Material',desc:'Careta KTM 17-23',imp:5.97,uds:1,pu:5.97,notas:''},
+  {id:'G007',fecha:'2026-03-31',cat:'Faro base',desc:'Faro (Lote 2)',imp:92.23,uds:8,pu:11.52875,notas:'Reembolso +36,27'},
+  {id:'G008',fecha:'2026-03-31',cat:'Material',desc:'Conector KTM - Husqvarna',imp:4.49,uds:40,pu:0.11225,notas:''},
+  {id:'G009',fecha:'2026-03-31',cat:'Faro base',desc:'Faro (Lote 3)',imp:103.3,uds:6,pu:17.216667,notas:''},
+  {id:'G010',fecha:'2026-03-31',cat:'Faro base',desc:'Faro (Lote 4)',imp:60,uds:4,pu:15,notas:''},
+  {id:'G011',fecha:'2026-03-31',cat:'Faro base',desc:'Faro (Lote 5)',imp:90.69,uds:6,pu:15.115,notas:''},
+  {id:'G012',fecha:'2026-03-31',cat:'Faro base',desc:'Faro (Lote 6)',imp:157.08,uds:10,pu:15.708,notas:''},
+  {id:'G013',fecha:'2026-03-31',cat:'Material',desc:'Conector Rieju 1',imp:12.34,uds:20,pu:0.617,notas:''},
+  {id:'G014',fecha:'2026-03-31',cat:'Material',desc:'Conector Rieju 2',imp:6.5,uds:2,pu:3.25,notas:''},
+  {id:'G015',fecha:'2026-03-31',cat:'Material',desc:'Filamento Naranja/Azul',imp:26,uds:1300,pu:0.02,notas:'En gramos'},
+  {id:'G016',fecha:'2026-03-31',cat:'Herramienta',desc:'Tornillería',imp:10,uds:230,pu:0.043478,notas:''},
+  {id:'G017',fecha:'2026-03-31',cat:'Material',desc:'Careta Husqvarna',imp:13.87,uds:1,pu:13.87,notas:''},
+  {id:'G018',fecha:'2026-03-31',cat:'Herramienta',desc:'Crimpadora',imp:2.87,uds:1,pu:2.87,notas:''},
+  {id:'G019',fecha:'2026-03-31',cat:'Material',desc:'Tubo termoretractil',imp:2.04,uds:175,pu:0.011657,notas:''},
+  {id:'G020',fecha:'2026-03-31',cat:'Material',desc:'Conector Beta (Lote 2)',imp:3.5,uds:20,pu:0.175,notas:''},
+  {id:'G021',fecha:'2026-03-31',cat:'Material',desc:'Conector KTM - Husq. (L2)',imp:2.02,uds:10,pu:0.202,notas:''},
+  {id:'G022',fecha:'2026-04-01',cat:'Material',desc:'Faro (Lote 7)',imp:142.81,uds:10,pu:14.281,notas:''},
+  {id:'G023',fecha:'2026-04-07',cat:'Material',desc:'Papel burbuja',imp:5.95,uds:1,pu:5.95,notas:''},
+];
+
+let clientes=[
+  {id:'C001',nombre:'Javier Soria',marca:'Beta',canal:'Facebook',estado:'Venta',fecha:'2026-03-31',notas:''},
+  {id:'C002',nombre:'Baltasar',marca:'Beta',canal:'Wallapop',estado:'Venta',fecha:'2026-03-31',notas:'2 Faros'},
+  {id:'C003',nombre:'Jose Antonio',marca:'Beta',canal:'Facebook',estado:'Venta',fecha:'2026-03-31',notas:''},
+  {id:'C004',nombre:'Fershu',marca:'Beta',canal:'Wallapop',estado:'Venta',fecha:'2026-03-31',notas:''},
+  {id:'C005',nombre:'Sebastien Lelievre',marca:'Beta',canal:'Facebook',estado:'Venta',fecha:'2026-03-31',notas:''},
+  {id:'C006',nombre:'Tommy',marca:'Beta',canal:'Vinted',estado:'Venta',fecha:'2026-03-31',notas:''},
+  {id:'C007',nombre:'Ferran Doll',marca:'Beta',canal:'Wallapop',estado:'Venta',fecha:'2026-03-31',notas:''},
+  {id:'C008',nombre:'Agapito Rafael',marca:'Beta',canal:'Facebook',estado:'Venta',fecha:'2026-03-31',notas:''},
+  {id:'C009',nombre:'Iván Roales',marca:'Beta',canal:'Wallapop',estado:'Venta',fecha:'2026-03-31',notas:''},
+  {id:'C010',nombre:'Primo Agapito',marca:'Beta',canal:'Boca a boca',estado:'Venta',fecha:'2026-03-31',notas:''},
+  {id:'C011',nombre:'Rubén L',marca:'Beta',canal:'Wallapop',estado:'Venta',fecha:'2026-03-31',notas:''},
+  {id:'C012',nombre:'Juan J',marca:'KTM',canal:'Wallapop',estado:'Venta',fecha:'2026-03-31',notas:''},
+  {id:'C013',nombre:'Julio',marca:'KTM',canal:'Wallapop',estado:'Venta',fecha:'2026-03-31',notas:''},
+  {id:'C014',nombre:'Forastieri',marca:'KTM',canal:'Vinted',estado:'Venta',fecha:'2026-03-31',notas:''},
+  {id:'C015',nombre:'David',marca:'KTM',canal:'Wallapop',estado:'Venta',fecha:'2026-03-31',notas:''},
+  {id:'C016',nombre:'Jose Antonio 2',marca:'Husqvarna',canal:'Wallapop',estado:'Venta',fecha:'2026-03-31',notas:''},
+  {id:'C017',nombre:'Sergio',marca:'Rieju',canal:'Wallapop',estado:'Venta',fecha:'2026-03-31',notas:''},
+  {id:'C018',nombre:'Waldek Mrozek',marca:'Rieju',canal:'Facebook',estado:'Venta',fecha:'2026-03-31',notas:'4 Faros'},
+  {id:'C019',nombre:'Unai',marca:'Rieju',canal:'Wallapop',estado:'Venta',fecha:'2026-03-31',notas:''},
+  {id:'C020',nombre:'Adrián',marca:'Beta',canal:'Wallapop',estado:'Venta',fecha:'2026-03-31',notas:''},
+  {id:'C021',nombre:'Fran',marca:'Beta',canal:'Wallapop',estado:'Venta',fecha:'2026-03-31',notas:''},
+  {id:'C022',nombre:'Daniel Astorga',marca:'Rieju',canal:'Facebook',estado:'Venta',fecha:'2026-03-31',notas:''},
+  {id:'C023',nombre:'New Solutions Car',marca:'Rieju',canal:'Facebook',estado:'Interesado',fecha:'2026-03-31',notas:''},
+  {id:'C024',nombre:'Gabriel',marca:'Husqvarna',canal:'Wallapop',estado:'Venta',fecha:'2026-04-02',notas:''},
+  {id:'C025',nombre:'Alberto',marca:'Beta',canal:'Wallapop',estado:'Venta',fecha:'2026-04-07',notas:''},
+  {id:'C026',nombre:'Biel',marca:'Gas Gas',canal:'Wallapop',estado:'Venta',fecha:'2026-04-08',notas:''},
+];
+
+let inv=[
+  {id:'F001',tipo:'Faro (Lote 1)',uds:0,notas:''},
+  {id:'F002',tipo:'Faro (Lote 2)',uds:0,notas:''},
+  {id:'F003',tipo:'Faro (Lote 3)',uds:0,notas:''},
+  {id:'F004',tipo:'Faro (Lote 4)',uds:0,notas:''},
+  {id:'F005',tipo:'Faro (Lote 5)',uds:0,notas:''},
+  {id:'F006',tipo:'Faro (Lote 6)',uds:6,notas:''},
+  {id:'F007',tipo:'Faro (Lote 7)',uds:10,notas:''},
+];
+
+// helpers
+const f2=v=>(+v).toLocaleString('es-ES',{minimumFractionDigits:2,maximumFractionDigits:2});
+const f4=v=>(+v).toLocaleString('es-ES',{minimumFractionDigits:2,maximumFractionDigits:4});
+const today=()=>new Date().toISOString().slice(0,10);
+const nid=(arr,pre)=>pre+String(Math.max(0,...arr.map(x=>parseInt(x.id.replace(pre,''))||0))+1).padStart(3,'0');
+const ngvid=()=>'GV'+String(Math.max(0,...gv.map(x=>parseInt(x.id.replace('GV',''))||0))+1).padStart(3,'0');
+const cn=id=>(clientes.find(x=>x.id===id)||{nombre:id}).nombre;
+const fn=id=>(inv.find(x=>x.id===id)||{tipo:id}).tipo;
+const vgv=vid=>gv.filter(g=>g.v===vid);
+const vcost=vid=>vgv(vid).reduce((s,g)=>s+g.pu*g.u,0);
+const vben=v=>v.precio-vcost(v.id);
+const catcol=c=>({'Faro base':'br','Material':'bb','Electricidad':'ba','Herramienta':'bg','Envío':'bb'}[c]||'bb');
+const ebadge=e=>({'Entregado':'bg','Preparando':'ba','Enviado':'bb'}[e]||'ba');
+let filt={v:'',ve:'',g:'',gc:'',c:'',cc:''};
+let ap='resumen';
+
+// NAV
+const navItems=[{k:'resumen',i:'◈',l:'Resumen'},{k:'ventas',i:'€',l:'Ventas'},{k:'gastos',i:'↓',l:'Gastos'},{k:'clientes',i:'◉',l:'Clientes'},{k:'inventario',i:'▦',l:'Inventario'}];
+document.getElementById('nav').innerHTML=navItems.map(n=>`<div class="nav-item ${n.k==='resumen'?'active':''}" id="ni-${n.k}" onclick="nav('${n.k}')"><span class="nav-icon">${n.i}</span>${n.l}</div>`).join('');
+
+function nav(k){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  document.getElementById('page-'+k).classList.add('active');
+  document.getElementById('ni-'+k).classList.add('active');
+  ap=k; renders[k]();
+}
+
+// RESUMEN
+function renderR(){
+  const ben=ventas.reduce((s,v)=>s+vben(v),0);
+  const ing=ventas.reduce((s,v)=>s+v.precio,0);
+  const gas=gastos.reduce((s,g)=>s+g.imp,0);
+  const stock=inv.reduce((s,i)=>s+i.uds,0);
+  const mg=ing>0?(ben/ing*100):0;
+  document.getElementById('kpi').innerHTML=`
+    <div class="kpi"><div class="kpi-l">Beneficio neto</div><div class="kpi-v g">${f2(ben)} €</div><div class="kpi-s">${ventas.length} ventas · ${mg.toFixed(1)}% margen</div></div>
+    <div class="kpi"><div class="kpi-l">Ingresos</div><div class="kpi-v">${f2(ing)} €</div><div class="kpi-s">Precio medio: ${f2(ing/ventas.length)} €</div></div>
+    <div class="kpi"><div class="kpi-l">Gastos totales</div><div class="kpi-v r">${f2(gas)} €</div><div class="kpi-s">${gastos.length} partidas</div></div>
+    <div class="kpi"><div class="kpi-l">Stock</div><div class="kpi-v a">${stock} uds</div><div class="kpi-s">${inv.filter(i=>i.uds>0).length} lotes activos</div></div>
+    <div class="kpi"><div class="kpi-l">Clientes</div><div class="kpi-v">${clientes.length}</div><div class="kpi-s">${clientes.filter(c=>c.estado==='Interesado').length} interesado(s)</div></div>
+  `;
+  const meses=['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+  const maxB=Math.max(1,...meses.map((_,i)=>ventas.filter(v=>new Date(v.fecha).getMonth()===i).reduce((s,v)=>s+vben(v),0)));
+  document.getElementById('months').innerHTML=meses.map((m,i)=>{
+    const mv=ventas.filter(v=>new Date(v.fecha).getMonth()===i);
+    if(!mv.length) return '';
+    const b=mv.reduce((s,v)=>s+vben(v),0),in2=mv.reduce((s,v)=>s+v.precio,0),mg2=in2>0?(b/in2*100):0;
+    return `<div class="mc"><div class="mc-n">${m}</div>
+      <div class="mc-r"><span>Ventas</span><span>${mv.length}</span></div>
+      <div class="mc-r"><span>Ingresos</span><span>${f2(in2)} €</span></div>
+      <div class="mc-r"><span>Beneficio</span><span>${f2(b)} €</span></div>
+      <div class="mc-r"><span>Margen</span><span>${mg2.toFixed(1)}%</span></div>
+      <div class="mbar"><div class="mbar-f" style="width:${(b/maxB*100).toFixed(1)}%"></div></div>
+    </div>`;
+  }).join('');
+  renderSF();
+}
+
+function renderSF(){
+  const ben=ventas.reduce((s,v)=>s+vben(v),0),stock=inv.reduce((s,i)=>s+i.uds,0);
+  document.getElementById('sf').innerHTML=`<div class="sf-row"><span>Beneficio</span><span>${f2(ben)} €</span></div><div class="sf-row"><span>Ventas</span><span>${ventas.length}</span></div><div class="sf-row"><span>Stock</span><span>${stock} uds</span></div>`;
+}
+
+// VENTAS
+function renderV(){
+  const ben=ventas.reduce((s,v)=>s+vben(v),0),ing=ventas.reduce((s,v)=>s+v.precio,0);
+  document.getElementById('vs').textContent=`${ventas.length} ventas · ${f2(ing)} € ingresos · ${f2(ben)} € beneficio`;
+  const rows=ventas.filter(v=>{
+    const q=filt.v.toLowerCase();
+    return(!q||v.id.toLowerCase().includes(q)||cn(v.cliente).toLowerCase().includes(q)||fn(v.faro).toLowerCase().includes(q)||v.notas.toLowerCase().includes(q))&&(!filt.ve||v.estado===filt.ve);
+  });
+  document.getElementById('vh').innerHTML='<tr><th>ID</th><th>Fecha</th><th>Cliente</th><th>Lote</th><th>Precio</th><th>Gastos</th><th>Beneficio</th><th>Estado</th><th>Notas</th><th></th></tr>';
+  document.getElementById('vb').innerHTML=rows.length?rows.map(v=>{
+    const cost=vcost(v.id),ben=vben(v);
+    return `<tr class="dr">
+      <td class="mono muted">${v.id}</td>
+      <td><span class="edit" onclick="ef(event,'ventas','${v.id}','fecha','date')">${v.fecha}</span></td>
+      <td>${cn(v.cliente)}</td>
+      <td class="mono" style="font-size:11px;color:var(--muted)">${fn(v.faro)}</td>
+      <td class="mono"><span class="edit" onclick="ef(event,'ventas','${v.id}','precio','number')">${f2(v.precio)} €</span></td>
+      <td class="mono" style="color:var(--red)">${f2(cost)} €</td>
+      <td class="mono" style="color:${ben>=0?'var(--accent)':'var(--red)'}">${f2(ben)} €</td>
+      <td><span class="edit" onclick="es(event,'ventas','${v.id}','estado',['Preparando','Enviado','Entregado'])"><span class="badge ${ebadge(v.estado)}">${v.estado}</span></span></td>
+      <td style="max-width:130px"><span class="edit" onclick="ef(event,'ventas','${v.id}','notas','text')" style="color:var(--muted);font-size:12px">${v.notas||'—'}</span></td>
+      <td style="display:flex;gap:4px">
+        <button class="bico" onclick="openPanel('${v.id}')" title="Ver detalle y gastos">↗</button>
+        <button class="bico del" onclick="delV('${v.id}')" title="Eliminar">✕</button>
+      </td>
+    </tr>`;
+  }).join(''):'<tr><td colspan="10" class="empty-td">No hay ventas que coincidan</td></tr>';
+}
+
+// GASTOS
+function renderG(){
+  const total=gastos.reduce((s,g)=>s+g.imp,0);
+  document.getElementById('gs').textContent=`${gastos.length} partidas · ${f2(total)} € total`;
+  const rows=gastos.filter(g=>{
+    const q=filt.g.toLowerCase();
+    return(!q||g.id.toLowerCase().includes(q)||g.desc.toLowerCase().includes(q)||g.cat.toLowerCase().includes(q))&&(!filt.gc||g.cat===filt.gc);
+  });
+  document.getElementById('gh').innerHTML='<tr><th>ID</th><th>Fecha</th><th>Categoría</th><th>Descripción</th><th>Uds.</th><th>€/u</th><th>Total</th><th>Notas</th><th></th></tr>';
+  document.getElementById('gb').innerHTML=rows.length?rows.map(g=>`<tr class="dr">
+    <td class="mono muted">${g.id}</td>
+    <td><span class="edit" onclick="ef(event,'gastos','${g.id}','fecha','date')">${g.fecha}</span></td>
+    <td><span class="edit" onclick="es(event,'gastos','${g.id}','cat',['Faro base','Material','Electricidad','Herramienta','Envío','Otro'])"><span class="badge ${catcol(g.cat)}">${g.cat}</span></span></td>
+    <td><span class="edit" onclick="ef(event,'gastos','${g.id}','desc','text')">${g.desc}</span></td>
+    <td class="mono"><span class="edit" onclick="ef(event,'gastos','${g.id}','uds','number')">${g.uds}</span></td>
+    <td class="mono muted">${f4(g.pu)} €</td>
+    <td class="mono" style="color:var(--red)"><span class="edit" onclick="ef(event,'gastos','${g.id}','imp','number')">${f2(g.imp)} €</span></td>
+    <td style="max-width:120px"><span class="edit" onclick="ef(event,'gastos','${g.id}','notas','text')" style="color:var(--muted);font-size:12px">${g.notas||'—'}</span></td>
+    <td><button class="bico del" onclick="delItem('gastos','${g.id}')">✕</button></td>
+  </tr>`).join(''):'<tr><td colspan="9" class="empty-td">No hay gastos que coincidan</td></tr>';
+}
+
+// CLIENTES
+function renderC(){
+  document.getElementById('cs').textContent=`${clientes.length} clientes · ${clientes.filter(c=>c.estado==='Venta').length} con venta`;
+  const rows=clientes.filter(c=>{
+    const q=filt.c.toLowerCase();
+    return(!q||c.nombre.toLowerCase().includes(q)||c.marca.toLowerCase().includes(q)||c.id.toLowerCase().includes(q))&&(!filt.cc||c.canal===filt.cc);
+  });
+  document.getElementById('ch').innerHTML='<tr><th>ID</th><th>Nombre</th><th>Marca</th><th>Canal</th><th>Estado</th><th>Notas</th><th></th></tr>';
+  document.getElementById('cb').innerHTML=rows.length?rows.map(c=>`<tr class="dr">
+    <td class="mono muted">${c.id}</td>
+    <td><span class="edit" onclick="ef(event,'clientes','${c.id}','nombre','text')">${c.nombre}</span></td>
+    <td><span class="edit" onclick="es(event,'clientes','${c.id}','marca',['Beta','KTM','Husqvarna','Rieju','Gas Gas','Honda','Yamaha','Otro'])">${c.marca}</span></td>
+    <td><span class="edit" onclick="es(event,'clientes','${c.id}','canal',['Wallapop','Facebook','Vinted','Boca a boca','Instagram','Otro'])">${c.canal}</span></td>
+    <td><span class="edit" onclick="es(event,'clientes','${c.id}','estado',['Interesado','Venta'])"><span class="badge ${c.estado==='Venta'?'bg':'ba'}">${c.estado}</span></span></td>
+    <td style="max-width:140px"><span class="edit" onclick="ef(event,'clientes','${c.id}','notas','text')" style="color:var(--muted);font-size:12px">${c.notas||'—'}</span></td>
+    <td><button class="bico del" onclick="delItem('clientes','${c.id}')">✕</button></td>
+  </tr>`).join(''):'<tr><td colspan="7" class="empty-td">No hay clientes que coincidan</td></tr>';
+}
+
+// INVENTARIO
+function renderI(){
+  const total=inv.reduce((s,i)=>s+i.uds,0);
+  document.getElementById('is2').textContent=`${inv.length} lotes · ${total} uds en stock`;
+  document.getElementById('ig').innerHTML=inv.map(item=>`
+    <div class="ic">
+      <div class="ic-id">${item.id}</div>
+      <div class="ic-n">${item.tipo}</div>
+      <div class="ic-u ${item.uds===0?'zero':item.uds<=3?'low':'ok'}">${item.uds}</div>
+      <div class="ic-l">uds disponibles</div>
+      ${item.notas?`<div style="font-size:11px;color:var(--muted);margin-top:5px">${item.notas}</div>`:''}
+      <div class="ic-ctrl">
+        <button class="sb" onclick="adj('${item.id}',-1)">−</button>
+        <button class="sb" onclick="adj('${item.id}',1)">+</button>
+        <input type="number" value="${item.uds}" min="0" style="width:54px;padding:4px 7px;border:1px solid var(--border);border-radius:6px;font-size:13px;font-family:var(--mono);background:var(--bg);color:var(--text);outline:none" onchange="setU('${item.id}',this.value)" onfocus="this.select()">
+        <button class="bico del" onclick="delItem('inventario','${item.id}')" style="margin-left:auto">✕</button>
+      </div>
+    </div>`).join('');
+}
+
+const renders={resumen:renderR,ventas:renderV,gastos:renderG,clientes:renderC,inventario:renderI};
+
+// INLINE EDIT — FIELD
+function ef(e,tabla,id,campo,tipo){
+  e.stopPropagation();
+  const span=e.currentTarget;
+  const ds={ventas,gastos,clientes};
+  const obj=ds[tabla].find(x=>x.id===id);
+  const orig=obj[campo];
+  const inp=document.createElement('input');
+  inp.className='ii';
+  inp.type=tipo==='number'?'number':tipo==='date'?'date':'text';
+  inp.value=tipo==='number'?parseFloat(orig)||0:orig||'';
+  if(tipo==='number') inp.step='0.01';
+  inp.style.width=Math.max(70,span.offsetWidth+16)+'px';
+  span.replaceWith(inp); inp.focus(); inp.select();
+  const commit=()=>{
+    let nv=inp.value;
+    if(tipo==='number'){nv=parseFloat(nv)||0; obj[campo]=nv; if(campo==='imp'||campo==='uds') obj.pu=obj.uds>0?obj.imp/obj.uds:0;}
+    else obj[campo]=nv;
+    renders[tabla](); renderSF();
+  };
+  inp.addEventListener('blur',commit);
+  inp.addEventListener('keydown',ev=>{if(ev.key==='Enter') inp.blur(); if(ev.key==='Escape'){obj[campo]=orig; renders[tabla]();}});
+}
+
+// INLINE EDIT — SELECT
+function es(e,tabla,id,campo,opts){
+  e.stopPropagation();
+  const span=e.currentTarget;
+  const ds={ventas,gastos,clientes};
+  const obj=ds[tabla].find(x=>x.id===id);
+  const sel=document.createElement('select');
+  sel.className='is';
+  opts.forEach(o=>{const op=document.createElement('option');op.value=o;op.textContent=o;if(o===String(obj[campo])) op.selected=true;sel.appendChild(op);});
+  span.replaceWith(sel); sel.focus();
+  const commit=()=>{obj[campo]=sel.value; renders[tabla](); renderSF();};
+  sel.addEventListener('change',commit);
+  sel.addEventListener('blur',commit);
+}
+
+// PANEL DETALLE
+let panelVid=null;
+function openPanel(vid){
+  panelVid=vid;
+  const v=ventas.find(x=>x.id===vid); if(!v) return;
+  document.getElementById('panel-title').textContent=`Venta ${v.id} — ${cn(v.cliente)}`;
+  renderPanelBody(vid);
+  document.getElementById('pov').classList.add('open');
+  document.getElementById('panel').classList.add('open');
+}
+
+function renderPanelBody(vid){
+  const v=ventas.find(x=>x.id===vid); if(!v) return;
+  const lines=vgv(vid);
+  const cost=lines.reduce((s,g)=>s+g.pu*g.u,0);
+  const ben=v.precio-cost;
+  document.getElementById('pb').innerHTML=`
+    <div class="psec">
+      <div class="psec-t">Datos generales</div>
+      <div class="frow"><span class="fl">Cliente</span><span class="fv">${cn(v.cliente)}</span></div>
+      <div class="frow"><span class="fl">Fecha</span><span class="fv edit" onclick="ef(event,'ventas','${v.id}','fecha','date')">${v.fecha}</span></div>
+      <div class="frow"><span class="fl">Lote</span><span class="fv">${fn(v.faro)}</span></div>
+      <div class="frow"><span class="fl">Precio final</span><span class="fv edit mono" onclick="ef(event,'ventas','${v.id}','precio','number')">${f2(v.precio)} €</span></div>
+      <div class="frow"><span class="fl">Estado envío</span><span class="fv edit" onclick="es(event,'ventas','${v.id}','estado',['Preparando','Enviado','Entregado'])"><span class="badge ${ebadge(v.estado)}">${v.estado}</span></span></div>
+      <div class="frow"><span class="fl">Valoración</span><span class="fv edit" onclick="es(event,'ventas','${v.id}','valoracion',[5,4,3,2,1].map(String))">${v.valoracion} ★</span></div>
+      <div class="frow"><span class="fl">Notas</span><span class="fv edit" style="color:var(--muted)" onclick="ef(event,'ventas','${v.id}','notas','text')">${v.notas||'—'}</span></div>
+    </div>
+    <div class="psec">
+      <div class="psec-t">Gastos de esta venta</div>
+      <table class="gvt">
+        <thead><tr><th>Descripción</th><th>€/u</th><th>Uds.</th><th>Subtotal</th><th></th></tr></thead>
+        <tbody>${lines.map(g=>`<tr>
+          <td><span class="edit" onclick="egv(event,'${g.id}','d')">${g.d}</span></td>
+          <td class="mono"><span class="edit" onclick="egv(event,'${g.id}','pu')">${f4(g.pu)}</span></td>
+          <td class="mono"><span class="edit" onclick="egv(event,'${g.id}','u')">${g.u}</span></td>
+          <td class="mono" style="color:var(--red)">${f2(g.pu*g.u)} €</td>
+          <td><button class="bico del" onclick="dgv('${g.id}','${vid}')" style="width:22px;height:22px;font-size:11px">✕</button></td>
+        </tr>`).join('')||'<tr><td colspan="5" class="empty-td" style="padding:10px">Sin gastos asignados</td></tr>'}</tbody>
+        <tfoot><tr style="border-top:2px solid var(--border)">
+          <td colspan="3" style="padding:6px 8px;font-size:12px;font-weight:500;text-align:right">Total gastos</td>
+          <td style="padding:6px 8px;font-family:var(--mono);font-size:12px;color:var(--red)">${f2(cost)} €</td><td></td>
+        </tr></tfoot>
+      </table>
+      <div style="margin-top:10px;padding:10px 12px;background:var(--surface2);border-radius:var(--r);display:flex;justify-content:space-between;align-items:center">
+        <span style="font-size:13px;font-weight:500">Beneficio neto</span>
+        <span style="font-family:var(--mono);font-size:16px;font-weight:500;color:${ben>=0?'var(--accent)':'var(--red)'}">${f2(ben)} €</span>
+      </div>
+    </div>
+    <div class="psec">
+      <div class="psec-t">Añadir línea de gasto</div>
+      <div style="display:grid;grid-template-columns:1fr 80px 64px auto;gap:6px;align-items:center">
+        <input class="gvi" type="text" id="gvd" placeholder="Descripción">
+        <input class="gvi" type="number" id="gvpu" placeholder="€/u" step="0.0001">
+        <input class="gvi" type="number" id="gvu" placeholder="Uds" value="1">
+        <button class="btn btn-p btn-sm" onclick="addGV('${vid}')">Añadir</button>
+      </div>
+    </div>
+  `;
+}
+
+function egv(e,gvid,campo){
+  e.stopPropagation();
+  const span=e.currentTarget;
+  const obj=gv.find(x=>x.id===gvid);
+  const orig=obj[campo];
+  const inp=document.createElement('input');
+  inp.className='gvi';
+  inp.type=campo==='d'?'text':'number';
+  inp.value=orig; inp.style.width=Math.max(60,span.offsetWidth+10)+'px';
+  if(campo!=='d') inp.step='0.0001';
+  span.replaceWith(inp); inp.focus(); inp.select();
+  const commit=()=>{obj[campo]=campo==='d'?inp.value:parseFloat(inp.value)||0; renderPanelBody(obj.v); renderV();};
+  inp.addEventListener('blur',commit);
+  inp.addEventListener('keydown',ev=>{if(ev.key==='Enter') inp.blur();});
+}
+
+function addGV(vid){
+  const d=document.getElementById('gvd').value.trim();
+  const pu=parseFloat(document.getElementById('gvpu').value)||0;
+  const u=parseFloat(document.getElementById('gvu').value)||1;
+  if(!d) return;
+  gv.push({id:ngvid(),v:vid,d,pu,u});
+  renderPanelBody(vid); renderV();
+}
+
+function dgv(gvid,vid){
+  gv=gv.filter(x=>x.id!==gvid);
+  renderPanelBody(vid); renderV();
+}
+
+function closePanel(){
+  document.getElementById('pov').classList.remove('open');
+  document.getElementById('panel').classList.remove('open');
+  panelVid=null;
+}
+
+// DELETE
+function delV(id){
+  if(!confirm(`¿Eliminar venta ${id} y sus gastos asociados?`)) return;
+  ventas=ventas.filter(x=>x.id!==id);
+  gv=gv.filter(x=>x.v!==id);
+  renderV(); renderSF();
+}
+
+function delItem(tabla,id){
+  if(!confirm('¿Eliminar este elemento?')) return;
+  if(tabla==='gastos') gastos=gastos.filter(x=>x.id!==id);
+  if(tabla==='clientes') clientes=clientes.filter(x=>x.id!==id);
+  if(tabla==='inventario') inv=inv.filter(x=>x.id!==id);
+  renders[tabla]();
+}
+
+// STOCK
+function adj(id,d){const i=inv.find(x=>x.id===id);if(i){i.uds=Math.max(0,i.uds+d);renderI();renderSF();}}
+function setU(id,v){const i=inv.find(x=>x.id===id);if(i){i.uds=Math.max(0,parseInt(v)||0);renderSF();}}
+
+// MODALS
+function openModal(t){
+  if(t==='venta'){
+    document.getElementById('nv-f').value=today();
+    document.getElementById('nv-c').innerHTML=clientes.map(c=>`<option value="${c.id}">${c.nombre}</option>`).join('');
+    document.getElementById('nv-l').innerHTML=inv.map(f=>`<option value="${f.id}">${f.tipo} (${f.uds} uds)</option>`).join('');
+  }
+  if(t==='gasto') document.getElementById('ng-f').value=today();
+  if(t==='cliente') document.getElementById('nc-f').value=today();
+  document.getElementById('modal-'+t).classList.add('open');
+}
+function closeModal(t){document.getElementById('modal-'+t).classList.remove('open');}
+
+function saveV(){
+  ventas.push({id:nid(ventas,'V'),fecha:document.getElementById('nv-f').value,cliente:document.getElementById('nv-c').value,
+    faro:document.getElementById('nv-l').value,precio:parseFloat(document.getElementById('nv-p').value)||0,
+    estado:document.getElementById('nv-e').value,valoracion:parseInt(document.getElementById('nv-v').value),notas:document.getElementById('nv-n').value});
+  closeModal('venta'); renderV(); renderSF();
+}
+
+function saveG(){
+  const imp=parseFloat(document.getElementById('ng-i').value)||0;
+  const uds=parseInt(document.getElementById('ng-u').value)||1;
+  gastos.push({id:nid(gastos,'G'),fecha:document.getElementById('ng-f').value,cat:document.getElementById('ng-c').value,
+    desc:document.getElementById('ng-d').value,imp,uds,pu:uds>0?imp/uds:0,notas:document.getElementById('ng-n').value});
+  closeModal('gasto'); renderG();
+}
+
+function saveC(){
+  clientes.push({id:nid(clientes,'C'),nombre:document.getElementById('nc-n').value,marca:document.getElementById('nc-m').value,
+    canal:document.getElementById('nc-c').value,estado:document.getElementById('nc-e').value,
+    fecha:document.getElementById('nc-f').value,notas:document.getElementById('nc-no').value});
+  closeModal('cliente'); renderC();
+}
+
+function saveL(){
+  const n=inv.length+1;
+  inv.push({id:'F'+String(n).padStart(3,'0'),tipo:document.getElementById('nl-n').value||`Faro (Lote ${n})`,
+    uds:parseInt(document.getElementById('nl-u').value)||0,notas:document.getElementById('nl-no').value});
+  closeModal('lote'); renderI();
+}
+
+document.querySelectorAll('.mbg').forEach(el=>el.addEventListener('click',e=>{if(e.target===el) el.classList.remove('open')}));
+
+renderR();
+</script>
+</body>
+</html>
